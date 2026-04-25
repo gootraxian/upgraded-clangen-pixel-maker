@@ -4,773 +4,785 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Katto's updated clangen pixel-cat maker</title>
-    <meta
-      name="description"
-      content="Make a ClanGen cat sprite in your browser. No download required!"
-    />
+    <meta name="description" content="Make a ClanGen cat sprite in your browser. No download required!" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html, body {
+        min-height: 100%;
+        width: 100%;
+        font-family: 'Poppins', sans-serif;
+        color: #f0f0f0;
+        background: #0d0d1a;
+        scrollbar-width: thin;
+        scrollbar-color: #ffffff40 rgba(0,0,0,0.2);
+      }
+
+      /* Animated starfield background */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(ellipse at 20% 50%, rgba(60, 40, 120, 0.3) 0%, transparent 60%),
+          radial-gradient(ellipse at 80% 20%, rgba(20, 60, 100, 0.3) 0%, transparent 60%),
+          radial-gradient(ellipse at 50% 80%, rgba(80, 20, 80, 0.2) 0%, transparent 60%);
+        z-index: -1;
+        animation: bgShift 12s ease-in-out infinite alternate;
+      }
+
+      @keyframes bgShift {
+        from { filter: hue-rotate(0deg); }
+        to   { filter: hue-rotate(30deg); }
+      }
+
+      /* ── Page layout ── */
+      .page-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem 1rem 4rem;
+        gap: 2rem;
+      }
+
+      header {
+        text-align: center;
+        animation: slideUp 0.6s ease-out;
+      }
+
+      header h1 {
+        font-size: clamp(1.4rem, 4vw, 2.2rem);
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        color: #fff;
+      }
+
+      header p {
+        font-size: 0.85rem;
+        font-weight: 300;
+        color: #bbb;
+        margin-top: 4px;
+      }
+
+      /* ── Glass card ── */
+      .glass-card {
+        background: rgba(10, 10, 10, 0.45);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        animation: slideUp 0.6s ease-out;
+      }
+
+      /* ── Sprite preview ── */
+      .sprite-preview-card {
+        padding: 1.5rem 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        min-width: 200px;
+      }
+
+      .sprite-preview-card h2 {
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.5);
+      }
+
+      .cat-sprite-img {
+        image-rendering: pixelated;
+        display: block;
+        border-radius: 8px;
+      }
+
+      /* ── Main layout ── */
+      .main-layout {
+        display: flex;
+        gap: 1.5rem;
+        width: 90%;
+        max-width: 980px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      /* ── Form card ── */
+      .form-card {
+        flex: 1;
+        min-width: 300px;
+        max-width: 620px;
+        padding: 2rem;
+      }
+
+      .form-card h2 {
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      /* ── Form sections ── */
+      .form-section-title {
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.35);
+        margin: 1.4rem 0 0.6rem;
+        padding-bottom: 4px;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+      }
+
+      /* ── Form rows ── */
+      .form-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 0;
+      }
+
+      .form-row label {
+        font-size: 13px;
+        font-weight: 400;
+        color: #ccc;
+        min-width: 130px;
+        flex-shrink: 0;
+      }
+
+      /* ── Selects ── */
+      select {
+        flex: 1;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: #f0f0f0;
+        font-family: 'Poppins', sans-serif;
+        font-size: 13px;
+        font-weight: 300;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23ffffff60'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        padding-right: 28px;
+      }
+
+      select:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+
+      select:focus {
+        outline: none;
+        border-color: rgba(180, 140, 255, 0.5);
+        box-shadow: 0 0 0 3px rgba(140, 100, 255, 0.15);
+      }
+
+      select:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      select option,
+      select optgroup {
+        background: #1a1a2e;
+        color: #f0f0f0;
+      }
+
+      /* ── Checkboxes ── */
+      input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #a78bfa;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+
+      /* ── Random button ── */
+      .random-button {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: #fff;
+        font-size: 14px;
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        flex-shrink: 0;
+        padding: 0;
+      }
+
+      .random-button:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: rotate(90deg) scale(1.1);
+        border-color: rgba(255,255,255,0.25);
+      }
+
+      .random-button:active {
+        transform: rotate(180deg) scale(0.95);
+      }
+
+      /* ── Action buttons ── */
+      .actions-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 1.5rem;
+      }
+
+      .action-btn {
+        flex: 1;
+        min-width: 120px;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        font-family: 'Poppins', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: #fff;
+      }
+
+      .randomize-all-button {
+        background: linear-gradient(135deg, #7c3aed, #a855f7);
+        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
+      }
+
+      .randomize-all-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(124, 58, 237, 0.5);
+      }
+
+      .copy-url-button {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255,255,255,0.15);
+      }
+
+      .copy-url-button:hover {
+        background: rgba(255, 255, 255, 0.18);
+        transform: translateY(-2px);
+      }
+
+      .import-json-button {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255,255,255,0.15);
+      }
+
+      .import-json-button:hover {
+        background: rgba(255, 255, 255, 0.18);
+        transform: translateY(-2px);
+      }
+
+      /* ── Sharecode textarea ── */
+      .sharecode-div {
+        margin-top: 1.2rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+
+      .sharecode-div label {
+        min-width: unset;
+        font-size: 11px;
+        color: rgba(255,255,255,0.4);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+
+      .sharecode {
+        width: 100%;
+        padding: 10px 14px;
+        background: rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 8px;
+        color: #aaa;
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        resize: vertical;
+        scrollbar-width: thin;
+      }
+
+      .sharecode:focus { outline: none; }
+
+      /* ── Footer ── */
+      footer {
+        text-align: center;
+        font-size: 12px;
+        font-weight: 300;
+        color: rgba(255,255,255,0.35);
+        animation: slideUp 0.8s ease-out;
+        padding-bottom: 1rem;
+      }
+
+      footer a {
+        color: rgba(180, 140, 255, 0.8);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      footer a:hover { color: #c4b5fd; }
+
+      footer p + p { margin-top: 4px; }
+
+      /* ── Scrollbar ── */
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.2);
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+
+      /* ── Animations ── */
+      @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      /* ── Responsive ── */
+      @media (max-width: 600px) {
+        .form-row label { min-width: 100px; font-size: 12px; }
+        .form-card { padding: 1.2rem; }
+        .main-layout { width: 95%; }
+      }
+    </style>
   </head>
   <body>
-    <img draggable="true" class="cat-sprite-img" style="image-rendering: pixelated" />
+    <div class="page-wrapper">
 
-    <form>
-      <div class="form-row">
-        <label>Sprite</label>
-        <select class="sprite-no-select">
-          <option value="0">Kitten (0)</option>
-          <option value="1">Kitten (1)</option>
-          <option value="2">Kitten (2)</option>
-          <option value="3">Adolescent (3)</option>
-          <option value="4">Adolescent (4)</option>
-          <option value="5">Adolescent (5)</option>
-          <option value="6">Adult (6)</option>
-          <option value="7">Adult (7)</option>
-          <option value="8">Adult (8)</option>
-          <option value="9">Longhair Adult (9)</option>
-          <option value="10">Longhair Adult (10)</option>
-          <option value="11">Longhair Adult (11)</option>
-          <option value="12">Senior (12)</option>
-          <option value="13">Senior (13)</option>
-          <option value="14">Senior (14)</option>
-          <option value="15">Paralyzed Adult (15)</option>
-          <option value="16">Paralyzed Longhair Adult (16)</option>
-          <option value="17">Paralyzed Young (17)</option>
-          <option value="18">Sick Adult (18)</option>
-          <option value="19">Sick Young (19)</option>
-          <option value="20">Newborn (20)</option>
-        </select>
-        <button class="random-button" data-select-id="sprite-no-select">
-          🔀
-        </button>
-      </div>
-      <div class="form-row">
-        <label>Pelt</label>
-        <select class="pelt-name-select">
-          <option>SingleColour</option>
-          <option>TwoColour</option>
-          <option>Tabby</option>
-          <option>Marbled</option>
-          <option>Rosette</option>
-          <option>Smoke</option>
-          <option>Ticked</option>
-          <option>Speckled</option>
-          <option>Bengal</option>
-          <option>Mackerel</option>
-          <option>Classic</option>
-          <option>Sokoke</option>
-          <option>Agouti</option>
-          <option>Singlestripe</option>
-          <option>Masked</option>
-        </select>
-        <button class="random-button" data-select-id="pelt-name-select">
-          🔀
-        </button>
-      </div>
+      <header>
+        <h1>Katto's ClanGen Pixel Cat Maker</h1>
+        <p>Build a cat from clangen in your browser — no download required!</p>
+      </header>
 
-      <div class="form-row">
-        <label>Colour</label>
-        <select class="colour-select">
-          <option>CREAM</option>
-          <option>PALEGINGER</option>
-          <option>GOLDEN</option>
-          <option>GINGER</option>
-          <option>DARKGINGER</option>
-          <option>SIENNA</option>
-          <option>GREY</option>
-          <option>DARKGREY</option>
-          <option>GHOST</option>
-          <option>BLACK</option>
-          <option>WHITE</option>
-          <option>PALEGREY</option>
-          <option>SILVER</option>
-          <option>LIGHTBROWN</option>
-          <option>LILAC</option>
-          <option>BROWN</option>
-          <option>GOLDEN-BROWN</option>
-          <option>DARKBROWN</option>
-          <option>CHOCOLATE</option>
-        </select>
-        <button class="random-button" data-select-id="colour-select">🔀</button>
-      </div>
+      <div class="main-layout">
 
-      <div class="form-row">
-        <label>Tortie?</label>
-        <input class="tortie-checkbox" type="checkbox" />
-      </div>
+        <!-- Sprite Preview -->
+        <div class="glass-card sprite-preview-card">
+          <h2>Preview</h2>
+          <img draggable="true" class="cat-sprite-img" style="image-rendering: pixelated" />
+        </div>
 
-      <div class="form-row">
-        <label>Tortie Mask</label>
-        <select disabled class="tortie-mask-select">
-          <option>ONE</option>
-          <option>TWO</option>
-          <option>THREE</option>
-          <option>FOUR</option>
-          <option>REDTAIL</option>
-          <option>DELILAH</option>
-          <option>MINIMALONE</option>
-          <option>MINIMALTWO</option>
-          <option>MINIMALTHREE</option>
-          <option>MINIMALFOUR</option>
-          <option>HALF</option>
-          <option>OREO</option>
-          <option>SWOOP</option>
-          <option>MOTTLED</option>
-          <option>SIDEMASK</option>
-          <option>EYEDOT</option>
-          <option>BANDANA</option>
-          <option>PACMAN</option>
-          <option>STREAMSTRIKE</option>
-          <option>ORIOLE</option>
-          <option>CHIMERA</option>
-          <option>DAUB</option>
-          <option>EMBER</option>
-          <option>BLANKET</option>
-          <option>ROBIN</option>
-          <option>BRINDLE</option>
-          <option>PAIGE</option>
-          <option>ROSETAIL</option>
-          <option>SAFI</option>
-          <option>SMUDGED</option>
-          <option>DAPPLENIGHT</option>
-          <option>STREAK</option>
-          <option>MASK</option>
-          <option>CHEST</option>
-          <option>ARMTAIL</option>
-          <option>SMOKE</option>
-          <option>GRUMPYFACE</option>
-          <option>BRIE</option>
-          <option>BELOVED</option>
-          <option>BODY</option>
-          <option>SHILOH</option>
-          <option>FRECKLED</option>
-          <option>HEARTBEAT</option>
-        </select>
-        <button class="random-button" data-select-id="tortie-mask-select">
-          🔀
-        </button>
-      </div>
+        <!-- Controls Form -->
+        <div class="glass-card form-card">
+          <h2>Customise</h2>
+          <form>
 
-      <div class="form-row">
-        <label>Tortie Pelt</label>
-        <select disabled class="tortie-pattern-select">
-          <option>SingleColour</option>
-          <option>TwoColour</option>
-          <option>Tabby</option>
-          <option>Marbled</option>
-          <option>Rosette</option>
-          <option>Smoke</option>
-          <option>Ticked</option>
-          <option>Speckled</option>
-          <option>Bengal</option>
-          <option>Mackerel</option>
-          <option>Classic</option>
-          <option>Sokoke</option>
-          <option>Agouti</option>
-          <option>Singlestripe</option>
-          <option>Masked</option>
-        </select>
-        <button class="random-button" data-select-id="tortie-pattern-select">
-          🔀
-        </button>
-      </div>
+            <div class="form-section-title">Pose</div>
+            <div class="form-row">
+              <label>Sprite</label>
+              <select class="sprite-no-select">
+                <option value="0">Kitten (0)</option>
+                <option value="1">Kitten (1)</option>
+                <option value="2">Kitten (2)</option>
+                <option value="3">Adolescent (3)</option>
+                <option value="4">Adolescent (4)</option>
+                <option value="5">Adolescent (5)</option>
+                <option value="6">Adult (6)</option>
+                <option value="7">Adult (7)</option>
+                <option value="8">Adult (8)</option>
+                <option value="9">Longhair Adult (9)</option>
+                <option value="10">Longhair Adult (10)</option>
+                <option value="11">Longhair Adult (11)</option>
+                <option value="12">Senior (12)</option>
+                <option value="13">Senior (13)</option>
+                <option value="14">Senior (14)</option>
+                <option value="15">Paralyzed Adult (15)</option>
+                <option value="16">Paralyzed Longhair Adult (16)</option>
+                <option value="17">Paralyzed Young (17)</option>
+                <option value="18">Sick Adult (18)</option>
+                <option value="19">Sick Young (19)</option>
+                <option value="20">Newborn (20)</option>
+              </select>
+              <button class="random-button" data-select-id="sprite-no-select">🔀</button>
+            </div>
 
-      <div class="form-row">
-        <label>Tortie Colour</label>
-        <select disabled class="tortie-colour-select">
-          <option>CREAM</option>
-          <option>PALEGINGER</option>
-          <option>GOLDEN</option>
-          <option>GINGER</option>
-          <option>DARKGINGER</option>
-          <option>SIENNA</option>
-          <option>GREY</option>
-          <option>DARKGREY</option>
-          <option>GHOST</option>
-          <option>BLACK</option>
-          <option>WHITE</option>
-          <option>PALEGREY</option>
-          <option>SILVER</option>
-          <option>LIGHTBROWN</option>
-          <option>LILAC</option>
-          <option>BROWN</option>
-          <option>GOLDEN-BROWN</option>
-          <option>DARKBROWN</option>
-          <option>CHOCOLATE</option>
-        </select>
-        <button class="random-button" data-select-id="tortie-colour-select">
-          🔀
-        </button>
-      </div>
+            <div class="form-section-title">Pelt</div>
+            <div class="form-row">
+              <label>Pattern</label>
+              <select class="pelt-name-select">
+                <option>SingleColour</option><option>TwoColour</option><option>Tabby</option>
+                <option>Marbled</option><option>Rosette</option><option>Smoke</option>
+                <option>Ticked</option><option>Speckled</option><option>Bengal</option>
+                <option>Mackerel</option><option>Classic</option><option>Sokoke</option>
+                <option>Agouti</option><option>Singlestripe</option><option>Masked</option>
+              </select>
+              <button class="random-button" data-select-id="pelt-name-select">🔀</button>
+            </div>
+            <div class="form-row">
+              <label>Colour</label>
+              <select class="colour-select">
+                <option>CREAM</option><option>PALEGINGER</option><option>GOLDEN</option>
+                <option>GINGER</option><option>DARKGINGER</option><option>SIENNA</option>
+                <option>GREY</option><option>DARKGREY</option><option>GHOST</option>
+                <option>BLACK</option><option>WHITE</option><option>PALEGREY</option>
+                <option>SILVER</option><option>LIGHTBROWN</option><option>LILAC</option>
+                <option>BROWN</option><option>GOLDEN-BROWN</option><option>DARKBROWN</option>
+                <option>CHOCOLATE</option>
+              </select>
+              <button class="random-button" data-select-id="colour-select">🔀</button>
+            </div>
+            <div class="form-row">
+              <label>Tint</label>
+              <select class="tint-select">
+                <option>none</option><option>pink</option><option>gray</option>
+                <option>red</option><option>black</option><option>orange</option>
+                <option>yellow</option><option>purple</option><option>blue</option>
+                <option>dilute</option><option>warmdilute</option><option>cooldilute</option>
+              </select>
+              <button class="random-button" data-select-id="tint-select">🔀</button>
+            </div>
 
-      <div class="form-row">
-        <label>Tint</label>
-        <select class="tint-select">
-          <option>none</option>
-          <option>pink</option>
-          <option>gray</option>
-          <option>red</option>
-          <option>black</option>
-          <option>orange</option>
-          <option>yellow</option>
-          <option>purple</option>
-          <option>blue</option>
-          <option>dilute</option>
-          <option>warmdilute</option>
-          <option>cooldilute</option>
-        </select>
-        <button class="random-button" data-select-id="tint-select">🔀</button>
-      </div>
+            <div class="form-section-title">Tortie</div>
+            <div class="form-row">
+              <label>Tortie?</label>
+              <input class="tortie-checkbox" type="checkbox" />
+            </div>
+            <div class="form-row">
+              <label>Tortie Mask</label>
+              <select disabled class="tortie-mask-select">
+                <option>ONE</option><option>TWO</option><option>THREE</option><option>FOUR</option>
+                <option>REDTAIL</option><option>DELILAH</option><option>MINIMALONE</option>
+                <option>MINIMALTWO</option><option>MINIMALTHREE</option><option>MINIMALFOUR</option>
+                <option>HALF</option><option>OREO</option><option>SWOOP</option><option>MOTTLED</option>
+                <option>SIDEMASK</option><option>EYEDOT</option><option>BANDANA</option>
+                <option>PACMAN</option><option>STREAMSTRIKE</option><option>ORIOLE</option>
+                <option>CHIMERA</option><option>DAUB</option><option>EMBER</option>
+                <option>BLANKET</option><option>ROBIN</option><option>BRINDLE</option>
+                <option>PAIGE</option><option>ROSETAIL</option><option>SAFI</option>
+                <option>SMUDGED</option><option>DAPPLENIGHT</option><option>STREAK</option>
+                <option>MASK</option><option>CHEST</option><option>ARMTAIL</option>
+                <option>SMOKE</option><option>GRUMPYFACE</option><option>BRIE</option>
+                <option>BELOVED</option><option>BODY</option><option>SHILOH</option>
+                <option>FRECKLED</option><option>HEARTBEAT</option>
+              </select>
+              <button class="random-button" data-select-id="tortie-mask-select">🔀</button>
+            </div>
+            <div class="form-row">
+              <label>Tortie Pelt</label>
+              <select disabled class="tortie-pattern-select">
+                <option>SingleColour</option><option>TwoColour</option><option>Tabby</option>
+                <option>Marbled</option><option>Rosette</option><option>Smoke</option>
+                <option>Ticked</option><option>Speckled</option><option>Bengal</option>
+                <option>Mackerel</option><option>Classic</option><option>Sokoke</option>
+                <option>Agouti</option><option>Singlestripe</option><option>Masked</option>
+              </select>
+              <button class="random-button" data-select-id="tortie-pattern-select">🔀</button>
+            </div>
+            <div class="form-row">
+              <label>Tortie Colour</label>
+              <select disabled class="tortie-colour-select">
+                <option>CREAM</option><option>PALEGINGER</option><option>GOLDEN</option>
+                <option>GINGER</option><option>DARKGINGER</option><option>SIENNA</option>
+                <option>GREY</option><option>DARKGREY</option><option>GHOST</option>
+                <option>BLACK</option><option>WHITE</option><option>PALEGREY</option>
+                <option>SILVER</option><option>LIGHTBROWN</option><option>LILAC</option>
+                <option>BROWN</option><option>GOLDEN-BROWN</option><option>DARKBROWN</option>
+                <option>CHOCOLATE</option>
+              </select>
+              <button class="random-button" data-select-id="tortie-colour-select">🔀</button>
+            </div>
 
-      <div class="form-row">
-        <label>Eye Colour</label>
-        <select class="eye-colour-select">
-          <option>YELLOW</option>
-          <option>AMBER</option>
-          <option>HAZEL</option>
-          <option>PALEGREEN</option>
-          <option>GREEN</option>
-          <option>BLUE</option>
-          <option>DARKBLUE</option>
-          <option>GREY</option>
-          <option>CYAN</option>
-          <option>EMERALD</option>
-          <option>PALEBLUE</option>
-          <option>PALEYELLOW</option>
-          <option>GOLD</option>
-          <option>HEATHERBLUE</option>
-          <option>COPPER</option>
-          <option>SAGE</option>
-          <option>COBALT</option>
-          <option>SUNLITICE</option>
-          <option>GREENYELLOW</option>
-          <option>BRONZE</option>
-          <option>SILVER</option>
-        </select>
-        <button class="random-button" data-select-id="eye-colour-select">
-          🔀
-        </button>
-      </div>
+            <div class="form-section-title">Eyes &amp; Skin</div>
+            <div class="form-row">
+              <label>Eye Colour</label>
+              <select class="eye-colour-select">
+                <option>YELLOW</option><option>AMBER</option><option>HAZEL</option>
+                <option>PALEGREEN</option><option>GREEN</option><option>BLUE</option>
+                <option>DARKBLUE</option><option>GREY</option><option>CYAN</option>
+                <option>EMERALD</option><option>PALEBLUE</option><option>PALEYELLOW</option>
+                <option>GOLD</option><option>HEATHERBLUE</option><option>COPPER</option>
+                <option>SAGE</option><option>COBALT</option><option>SUNLITICE</option>
+                <option>GREENYELLOW</option><option>BRONZE</option><option>SILVER</option>
+              </select>
+              <button class="random-button" data-select-id="eye-colour-select">🔀</button>
+            </div>
+            <div class="form-row">
+              <label>Eye Colour 2</label>
+              <select class="eye-colour2-select">
+                <option></option>
+                <option>YELLOW</option><option>AMBER</option><option>HAZEL</option>
+                <option>PALEGREEN</option><option>GREEN</option><option>BLUE</option>
+                <option>DARKBLUE</option><option>GREY</option><option>CYAN</option>
+                <option>EMERALD</option><option>PALEBLUE</option><option>PALEYELLOW</option>
+                <option>GOLD</option><option>HEATHERBLUE</option><option>COPPER</option>
+                <option>SAGE</option><option>COBALT</option><option>SUNLITICE</option>
+                <option>GREENYELLOW</option><option>BRONZE</option><option>SILVER</option>
+              </select>
+              <button class="random-button" data-select-id="eye-colour2-select">🔀</button>
+            </div>
+            <div class="form-row">
+              <label>Skin</label>
+              <select class="skin-colour-select">
+                <option>BLACK</option><option>PINK</option><option>DARKBROWN</option>
+                <option>BROWN</option><option>LIGHTBROWN</option><option>DARK</option>
+                <option>DARKGREY</option><option>GREY</option><option>DARKSALMON</option>
+                <option>SALMON</option><option>PEACH</option><option>DARKMARBLED</option>
+                <option>MARBLED</option><option>LIGHTMARBLED</option><option>DARKBLUE</option>
+                <option>BLUE</option><option>LIGHTBLUE</option><option>RED</option>
+              </select>
+              <button class="random-button" data-select-id="skin-colour-select">🔀</button>
+            </div>
 
-      <div class="form-row">
-        <label>Eye Colour 2</label>
-        <select class="eye-colour2-select">
-          <option></option>
-          <option>YELLOW</option>
-          <option>AMBER</option>
-          <option>HAZEL</option>
-          <option>PALEGREEN</option>
-          <option>GREEN</option>
-          <option>BLUE</option>
-          <option>DARKBLUE</option>
-          <option>GREY</option>
-          <option>CYAN</option>
-          <option>EMERALD</option>
-          <option>PALEBLUE</option>
-          <option>PALEYELLOW</option>
-          <option>GOLD</option>
-          <option>HEATHERBLUE</option>
-          <option>COPPER</option>
-          <option>SAGE</option>
-          <option>COBALT</option>
-          <option>SUNLITICE</option>
-          <option>GREENYELLOW</option>
-          <option>BRONZE</option>
-          <option>SILVER</option>
-        </select>
-        <button class="random-button" data-select-id="eye-colour2-select">
-          🔀
-        </button>
-      </div>
+            <div class="form-section-title">Markings</div>
+            <div class="form-row">
+              <label>White Patches</label>
+              <select class="white-patches-select">
+                <option></option>
+                <optgroup label="little_white">
+                  <option>LITTLE</option><option>LIGHTTUXEDO</option><option>BUZZARDFANG</option>
+                  <option>TIP</option><option>BLAZE</option><option>BIB</option>
+                  <option>VEE</option><option>PAWS</option><option>BELLY</option>
+                  <option>TAILTIP</option><option>TOES</option><option>BROKENBLAZE</option>
+                  <option>LILTWO</option><option>SCOURGE</option><option>TOESTAIL</option>
+                  <option>RAVENPAW</option><option>HONEY</option><option>LUNA</option>
+                  <option>EXTRA</option><option>MUSTACHE</option><option>REVERSEHEART</option>
+                  <option>SPARKLE</option><option>RIGHTEAR</option><option>LEFTEAR</option>
+                  <option>ESTRELLA</option><option>REVERSEEYE</option><option>BACKSPOT</option>
+                  <option>EYEBAGS</option><option>LOCKET</option><option>BLAZEMASK</option>
+                  <option>TEARS</option>
+                </optgroup>
+                <optgroup label="mid_white">
+                  <option>TUXEDO</option><option>FANCY</option><option>UNDERS</option>
+                  <option>DAMIEN</option><option>SKUNK</option><option>MITAINE</option>
+                  <option>SQUEAKS</option><option>STAR</option><option>WINGS</option>
+                  <option>DIVA</option><option>SAVANNAH</option><option>FADESPOTS</option>
+                  <option>BEARD</option><option>DAPPLEPAW</option><option>TOPCOVER</option>
+                  <option>WOODPECKER</option><option>MISS</option><option>BOWTIE</option>
+                  <option>VEST</option><option>FADEBELLY</option><option>DIGIT</option>
+                  <option>FCTWO</option><option>FCONE</option><option>MIA</option>
+                  <option>ROSINA</option><option>PRINCESS</option><option>DOUGIE</option>
+                </optgroup>
+                <optgroup label="high_white">
+                  <option>ANY</option><option>ANYTWO</option><option>BROKEN</option>
+                  <option>FRECKLES</option><option>RINGTAIL</option><option>HALFFACE</option>
+                  <option>PANTSTWO</option><option>GOATEE</option><option>PRINCE</option>
+                  <option>FAROFA</option><option>MISTER</option><option>PANTS</option>
+                  <option>REVERSEPANTS</option><option>HALFWHITE</option><option>APPALOOSA</option>
+                  <option>PIEBALD</option><option>CURVED</option><option>GLASS</option>
+                  <option>MASKMANTLE</option><option>MAO</option><option>PAINTED</option>
+                  <option>SHIBAINU</option><option>OWL</option><option>BUB</option>
+                  <option>SPARROW</option><option>TRIXIE</option><option>SAMMY</option>
+                  <option>FRONT</option><option>BLOSSOMSTEP</option><option>BULLSEYE</option>
+                  <option>FINN</option><option>SCAR</option><option>BUSTER</option>
+                  <option>HAWKBLAZE</option><option>CAKE</option>
+                </optgroup>
+                <optgroup label="mostly_white">
+                  <option>VAN</option><option>ONEEAR</option><option>LIGHTSONG</option>
+                  <option>TAIL</option><option>HEART</option><option>MOORISH</option>
+                  <option>APRON</option><option>CAPSADDLE</option><option>CHESTSPECK</option>
+                  <option>BLACKSTAR</option><option>PETAL</option><option>HEARTTWO</option>
+                  <option>PEBBLESHINE</option><option>BOOTS</option><option>COW</option>
+                  <option>COWTWO</option><option>LOVEBUG</option><option>SHOOTINGSTAR</option>
+                  <option>EYESPOT</option><option>PEBBLE</option><option>TAILTWO</option>
+                  <option>BUDDY</option><option>KROPKA</option>
+                </optgroup>
+                <optgroup label="fullwhite"><option>FULLWHITE</option></optgroup>
+              </select>
+              <button class="random-button" data-select-id="white-patches-select">🔀</button>
+            </div>
+            <div class="form-row">
+              <label>Points</label>
+              <select class="points-select">
+                <option></option><option>COLOURPOINT</option><option>RAGDOLL</option>
+                <option>SEPIAPOINT</option><option>MINKPOINT</option><option>SEALPOINT</option>
+              </select>
+              <button class="random-button" data-select-id="points-select">🔀</button>
+            </div>
+            <div class="form-row">
+              <label>White Tint</label>
+              <select class="white-patches-tint-select">
+                <option>none</option><option>darkcream</option><option>cream</option>
+                <option>offwhite</option><option>gray</option><option>pink</option>
+              </select>
+              <button class="random-button" data-select-id="white-patches-tint-select">🔀</button>
+            </div>
+            <div class="form-row">
+              <label>Vitiligo</label>
+              <select class="vitiligo-select">
+                <option></option><option>VITILIGO</option><option>VITILIGOTWO</option>
+                <option>MOON</option><option>PHANTOM</option><option>KARPATI</option>
+                <option>POWDER</option><option>BLEACHED</option><option>SMOKEY</option>
+              </select>
+              <button class="random-button" data-select-id="vitiligo-select">🔀</button>
+            </div>
 
-      <div class="form-row">
-        <label>Skin</label>
-        <select class="skin-colour-select">
-          <option>BLACK</option>
-          <option>PINK</option>
-          <option>DARKBROWN</option>
-          <option>BROWN</option>
-          <option>LIGHTBROWN</option>
-          <option>DARK</option>
-          <option>DARKGREY</option>
-          <option>GREY</option>
-          <option>DARKSALMON</option>
-          <option>SALMON</option>
-          <option>PEACH</option>
-          <option>DARKMARBLED</option>
-          <option>MARBLED</option>
-          <option>LIGHTMARBLED</option>
-          <option>DARKBLUE</option>
-          <option>BLUE</option>
-          <option>LIGHTBLUE</option>
-          <option>RED</option>
-        </select>
-        <button class="random-button" data-select-id="skin-colour-select">
-          🔀
-        </button>
-      </div>
+            <div class="form-section-title">Accessories &amp; Scars</div>
+            <div class="form-row">
+              <label>Accessory</label>
+              <select class="accessory-select">
+                <option></option>
+                <optgroup label="plant_accessories">
+                  <option>MAPLE LEAF</option><option>HOLLY</option><option>BLUE BERRIES</option>
+                  <option>FORGET ME NOTS</option><option>RYE STALK</option><option>CATTAIL</option>
+                  <option>POPPY</option><option>ORANGE POPPY</option><option>CYAN POPPY</option>
+                  <option>WHITE POPPY</option><option>PINK POPPY</option><option>BLUEBELLS</option>
+                  <option>LILY OF THE VALLEY</option><option>SNAPDRAGON</option><option>HERBS</option>
+                  <option>PETALS</option><option>NETTLE</option><option>HEATHER</option>
+                  <option>JUNIPER</option><option>RASPBERRY</option><option>LAVENDER</option>
+                  <option>OAK LEAVES</option><option>CATMINT</option><option>MAPLE SEED</option>
+                  <option>LAUREL</option><option>CLOVER</option><option>DAISY</option>
+                  <option>GORSE</option><option>DRY HERBS</option><option>DRY CATMINT</option>
+                  <option>DRY NETTLES</option><option>DRY LAURELS</option>
+                </optgroup>
+                <optgroup label="wild_accessories">
+                  <option>RED FEATHERS</option><option>BLUE FEATHERS</option><option>JAY FEATHERS</option>
+                  <option>GULL FEATHERS</option><option>SPARROW FEATHERS</option><option>MOTH WINGS</option>
+                  <option>ROSY MOTH WINGS</option><option>MORPHO BUTTERFLY</option>
+                  <option>MONARCH BUTTERFLY</option><option>CICADA WINGS</option><option>BLACK CICADA</option>
+                </optgroup>
+                <optgroup label="collars">
+                  <option>CRIMSON</option><option>BLUE</option><option>YELLOW</option>
+                  <option>CYAN</option><option>RED</option><option>LIME</option>
+                  <option>GREEN</option><option>RAINBOW</option><option>BLACK</option>
+                  <option>SPIKES</option><option>WHITE</option><option>PINK</option>
+                  <option>PURPLE</option><option>MULTI</option><option>INDIGO</option>
+                  <option>CRIMSONBELL</option><option>BLUEBELL</option><option>YELLOWBELL</option>
+                  <option>CYANBELL</option><option>REDBELL</option><option>LIMEBELL</option>
+                  <option>GREENBELL</option><option>RAINBOWBELL</option><option>BLACKBELL</option>
+                  <option>SPIKESBELL</option><option>WHITEBELL</option><option>PINKBELL</option>
+                  <option>PURPLEBELL</option><option>MULTIBELL</option><option>INDIGOBELL</option>
+                  <option>CRIMSONBOW</option><option>BLUEBOW</option><option>YELLOWBOW</option>
+                  <option>CYANBOW</option><option>REDBOW</option><option>LIMEBOW</option>
+                  <option>GREENBOW</option><option>RAINBOWBOW</option><option>BLACKBOW</option>
+                  <option>SPIKESBOW</option><option>WHITEBOW</option><option>PINKBOW</option>
+                  <option>PURPLEBOW</option><option>MULTIBOW</option><option>INDIGOBOW</option>
+                  <option>CRIMSONNYLON</option><option>BLUENYLON</option><option>YELLOWNYLON</option>
+                  <option>CYANNYLON</option><option>REDNYLON</option><option>LIMENYLON</option>
+                  <option>GREENNYLON</option><option>RAINBOWNYLON</option><option>BLACKNYLON</option>
+                  <option>SPIKESNYLON</option><option>WHITENYLON</option><option>PINKNYLON</option>
+                  <option>PURPLENYLON</option><option>MULTINYLON</option><option>INDIGONYLON</option>
+                </optgroup>
+              </select>
+              <button class="random-button" data-select-id="accessory-select">🔀</button>
+            </div>
+            <div class="form-row">
+              <label>Scar</label>
+              <select class="scar-select">
+                <option></option>
+                <optgroup label="Animal Scars">
+                  <option>ONE</option><option>TWO</option><option>THREE</option>
+                  <option>TAILSCAR</option><option>SNOUT</option><option>CHEEK</option>
+                  <option>SIDE</option><option>THROAT</option><option>TAILBASE</option>
+                  <option>BELLY</option><option>LEGBITE</option><option>NECKBITE</option>
+                  <option>FACE</option><option>MANLEG</option><option>BRIGHTHEART</option>
+                  <option>MANTAIL</option><option>BRIDGE</option><option>RIGHTBLIND</option>
+                  <option>LEFTBLIND</option><option>BOTHBLIND</option><option>BEAKCHEEK</option>
+                  <option>BEAKLOWER</option><option>CATBITE</option><option>RATBITE</option>
+                  <option>QUILLCHUNK</option><option>QUILLSCRATCH</option><option>HINDLEG</option>
+                  <option>BACK</option><option>QUILLSIDE</option><option>SCRATCHSIDE</option>
+                  <option>BEAKSIDE</option><option>CATBITETWO</option><option>FOUR</option>
+                </optgroup>
+                <optgroup label="Event Scars">
+                  <option>SNAKE</option><option>TOETRAP</option><option>BURNPAWS</option>
+                  <option>BURNTAIL</option><option>BURNBELLY</option><option>BURNRUMP</option>
+                  <option>FROSTFACE</option><option>FROSTTAIL</option><option>FROSTMITT</option>
+                  <option>FROSTSOCK</option><option>TOE</option><option>SNAKETWO</option>
+                </optgroup>
+                <optgroup label="Missing Parts">
+                  <option>LEFTEAR</option><option>RIGHTEAR</option><option>NOTAIL</option>
+                  <option>HALFTAIL</option><option>NOPAW</option><option>NOLEFTEAR</option>
+                  <option>NORIGHTEAR</option><option>NOEAR</option>
+                </optgroup>
+              </select>
+              <button class="random-button" data-select-id="scar-select">🔀</button>
+            </div>
 
-      <div class="form-row">
-        <label>White Patches</label>
-        <select class="white-patches-select">
-          <option></option>
-          <optgroup label="little_white">
-            <option>LITTLE</option>
-            <option>LIGHTTUXEDO</option>
-            <option>BUZZARDFANG</option>
-            <option>TIP</option>
-            <option>BLAZE</option>
-            <option>BIB</option>
-            <option>VEE</option>
-            <option>PAWS</option>
-            <option>BELLY</option>
-            <option>TAILTIP</option>
-            <option>TOES</option>
-            <option>BROKENBLAZE</option>
-            <option>LILTWO</option>
-            <option>SCOURGE</option>
-            <option>TOESTAIL</option>
-            <option>RAVENPAW</option>
-            <option>HONEY</option>
-            <option>LUNA</option>
-            <option>EXTRA</option>
-            <option>MUSTACHE</option>
-            <option>REVERSEHEART</option>
-            <option>SPARKLE</option>
-            <option>RIGHTEAR</option>
-            <option>LEFTEAR</option>
-            <option>ESTRELLA</option>
-            <option>REVERSEEYE</option>
-            <option>BACKSPOT</option>
-            <option>EYEBAGS</option>
-            <option>LOCKET</option>
-            <option>BLAZEMASK</option>
-            <option>TEARS</option>
-          </optgroup>
+            <div class="form-section-title">Display</div>
+            <div class="form-row">
+              <label>Lineart</label>
+              <select class="lineart-select">
+                <option value="regular">Regular</option>
+                <option value="dead">Dead</option>
+                <option value="dark forest">Dark Forest</option>
+                <option value="aprilfools-regular">Regular (April Fools')</option>
+                <option value="aprilfools-dead">Dead (April Fools')</option>
+                <option value="aprilfools-dark forest">Dark Forest (April Fools')</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>Shading</label>
+              <input class="shading-checkbox" type="checkbox" />
+            </div>
+            <div class="form-row">
+              <label>Reverse</label>
+              <input class="reverse-checkbox" type="checkbox" />
+            </div>
+            <div class="form-row">
+              <label>BG Colour</label>
+              <select class="bg-color-select">
+                <option value="rgb(0 0 0 / 0)">Transparent</option>
+                <option value="rgb(255 255 255)">White</option>
+                <option value="rgb(0 0 0)">Black</option>
+                <option value="rgb(0 255 0)">Lime Green</option>
+                <option value="rgb(206 194 168)">ClanGen Light</option>
+                <option value="rgb(57 50 36)">ClanGen Dark</option>
+                <option value="rgb(39 45 79)">Starry Blue</option>
+                <option value="rgb(158 151 170)">Unknown Grey</option>
+                <option value="rgb(42 17 13)">Starless Red</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>Scale</label>
+              <select class="zoom-level">
+                <option value="1">1×</option>
+                <option value="2">2×</option>
+                <option selected value="3">3×</option>
+                <option value="4">4×</option>
+                <option value="8">8×</option>
+                <option value="16">16×</option>
+                <option value="32">32×</option>
+              </select>
+            </div>
 
-          <optgroup label="mid_white">
-            <option>TUXEDO</option>
-            <option>FANCY</option>
-            <option>UNDERS</option>
-            <option>DAMIEN</option>
-            <option>SKUNK</option>
-            <option>MITAINE</option>
-            <option>SQUEAKS</option>
-            <option>STAR</option>
-            <option>WINGS</option>
-            <option>DIVA</option>
-            <option>SAVANNAH</option>
-            <option>FADESPOTS</option>
-            <option>BEARD</option>
-            <option>DAPPLEPAW</option>
-            <option>TOPCOVER</option>
-            <option>WOODPECKER</option>
-            <option>MISS</option>
-            <option>BOWTIE</option>
-            <option>VEST</option>
-            <option>FADEBELLY</option>
-            <option>DIGIT</option>
-            <option>FCTWO</option>
-            <option>FCONE</option>
-            <option>MIA</option>
-            <option>ROSINA</option>
-            <option>PRINCESS</option>
-            <option>DOUGIE</option>
-          </optgroup>
+            <!-- Actions -->
+            <div class="actions-row">
+              <button class="action-btn randomize-all-button">🎲 Randomize</button>
+              <button class="action-btn copy-url-button">🔗 Copy URL</button>
+              <button class="action-btn import-json-button">📥 Import JSON</button>
+            </div>
 
-          <optgroup label="high_white">
-            <option>ANY</option>
-            <option>ANYTWO</option>
-            <option>BROKEN</option>
-            <option>FRECKLES</option>
-            <option>RINGTAIL</option>
-            <option>HALFFACE</option>
-            <option>PANTSTWO</option>
-            <option>GOATEE</option>
-            <option>PRINCE</option>
-            <option>FAROFA</option>
-            <option>MISTER</option>
-            <option>PANTS</option>
-            <option>REVERSEPANTS</option>
-            <option>HALFWHITE</option>
-            <option>APPALOOSA</option>
-            <option>PIEBALD</option>
-            <option>CURVED</option>
-            <option>GLASS</option>
-            <option>MASKMANTLE</option>
-            <option>MAO</option>
-            <option>PAINTED</option>
-            <option>SHIBAINU</option>
-            <option>OWL</option>
-            <option>BUB</option>
-            <option>SPARROW</option>
-            <option>TRIXIE</option>
-            <option>SAMMY</option>
-            <option>FRONT</option>
-            <option>BLOSSOMSTEP</option>
-            <option>BULLSEYE</option>
-            <option>FINN</option>
-            <option>SCAR</option>
-            <option>BUSTER</option>
-            <option>HAWKBLAZE</option>
-            <option>CAKE</option>
-          </optgroup>
+            <!-- Sharecode -->
+            <div class="form-row sharecode-div">
+              <label>Appearance Data (reference only)</label>
+              <textarea readonly rows="8" class="sharecode"></textarea>
+            </div>
 
-          <optgroup label="mostly_white">
-            <option>VAN</option>
-            <option>ONEEAR</option>
-            <option>LIGHTSONG</option>
-            <option>TAIL</option>
-            <option>HEART</option>
-            <option>MOORISH</option>
-            <option>APRON</option>
-            <option>CAPSADDLE</option>
-            <option>CHESTSPECK</option>
-            <option>BLACKSTAR</option>
-            <option>PETAL</option>
-            <option>HEARTTWO</option>
-            <option>PEBBLESHINE</option>
-            <option>BOOTS</option>
-            <option>COW</option>
-            <option>COWTWO</option>
-            <option>LOVEBUG</option>
-            <option>SHOOTINGSTAR</option>
-            <option>EYESPOT</option>
-            <option>PEBBLE</option>
-            <option>TAILTWO</option>
-            <option>BUDDY</option>
-            <option>KROPKA</option>
-          </optgroup>
-
-          <optgroup label="fullwhite">
-            <option>FULLWHITE</option>
-          </optgroup>
-        </select>
-        <button class="random-button" data-select-id="white-patches-select">
-          🔀
-        </button>
+          </form>
+        </div>
       </div>
 
-      <div class="form-row">
-        <label>Points</label>
-        <select class="points-select">
-          <option></option>
-          <option>COLOURPOINT</option>
-          <option>RAGDOLL</option>
-          <option>SEPIAPOINT</option>
-          <option>MINKPOINT</option>
-          <option>SEALPOINT</option>
-        </select>
-        <button class="random-button" data-select-id="points-select">🔀</button>
-      </div>
+      <footer>
+        <p>
+          <a href="https://sablesteel.itch.io/clan-gen-fan-edit">ClanGen</a> —
+          Thanks to the clangen devteam for the amazing sprites!
+        </p>
+        <p>
+          Source code on <a href="https://github.com/gootraxian/upgraded-clangen-pixel-maker">GitHub</a> ·
+          Original generator at <a href="https://cgen-tools.github.io/pixel-cat-maker">cgen-tools</a>
+        </p>
+      </footer>
 
-      <div class="form-row">
-        <label>White Patches Tint</label>
-        <select class="white-patches-tint-select">
-          <option>none</option>
-          <option>darkcream</option>
-          <option>cream</option>
-          <option>offwhite</option>
-          <option>gray</option>
-          <option>pink</option>
-        </select>
-        <button
-          class="random-button"
-          data-select-id="white-patches-tint-select"
-        >
-          🔀
-        </button>
-      </div>
-
-      <div class="form-row">
-        <label>Vitiligo</label>
-        <select class="vitiligo-select">
-          <option></option>
-          <option>VITILIGO</option>
-          <option>VITILIGOTWO</option>
-          <option>MOON</option>
-          <option>PHANTOM</option>
-          <option>KARPATI</option>
-          <option>POWDER</option>
-          <option>BLEACHED</option>
-          <option>SMOKEY</option>
-        </select>
-        <button class="random-button" data-select-id="vitiligo-select">
-          🔀
-        </button>
-      </div>
-
-      <div class="form-row">
-        <label>Accessory</label>
-        <select class="accessory-select">
-          <option></option>
-          <optgroup label="plant_accessories">
-            <option>MAPLE LEAF</option>
-            <option>HOLLY</option>
-            <option>BLUE BERRIES</option>
-            <option>FORGET ME NOTS</option>
-            <option>RYE STALK</option>
-            <option>CATTAIL</option>
-            <option>POPPY</option>
-            <option>ORANGE POPPY</option>
-            <option>CYAN POPPY</option>
-            <option>WHITE POPPY</option>
-            <option>PINK POPPY</option>
-            <option>BLUEBELLS</option>
-            <option>LILY OF THE VALLEY</option>
-            <option>SNAPDRAGON</option>
-            <option>HERBS</option>
-            <option>PETALS</option>
-            <option>NETTLE</option>
-            <option>HEATHER</option>
-            <option>JUNIPER</option>
-            <option>RASPBERRY</option>
-            <option>LAVENDER</option>
-            <option>OAK LEAVES</option>
-            <option>CATMINT</option>
-            <option>MAPLE SEED</option>
-            <option>LAUREL</option>
-            <option>BULB WHITE</option>
-            <option>BULB YELLOW</option>
-            <option>BULB ORANGE</option>
-            <option>BULB PINK</option>
-            <option>BULB BLUE</option>
-            <option>CLOVER</option>
-            <option>DAISY</option>
-            <option>GORSE</option>
-            <option>BULB WHITE</option>
-            <option>BULB YELLOW</option>
-            <option>DRY HERBS</option>
-            <option>DRY CATMINT</option>
-            <option>DRY NETTLES</option>
-            <option>DRY LAURELS</option>
-          </optgroup>
-          <optgroup label="wild_accessories">
-            <option>RED FEATHERS</option>
-            <option>BLUE FEATHERS</option>
-            <option>JAY FEATHERS</option>
-            <option>GULL FEATHERS</option>
-            <option>SPARROW FEATHERS</option>
-            <option>MOTH WINGS</option>
-            <option>ROSY MOTH WINGS</option>
-            <option>MORPHO BUTTERFLY</option>
-            <option>MONARCH BUTTERFLY</option>
-            <option>CICADA WINGS</option>
-            <option>BLACK CICADA</option>
-          </optgroup>
-          <optgroup label="collars">
-            <option>CRIMSON</option>
-            <option>BLUE</option>
-            <option>YELLOW</option>
-            <option>CYAN</option>
-            <option>RED</option>
-            <option>LIME</option>
-            <option>GREEN</option>
-            <option>RAINBOW</option>
-            <option>BLACK</option>
-            <option>SPIKES</option>
-            <option>WHITE</option>
-            <option>PINK</option>
-            <option>PURPLE</option>
-            <option>MULTI</option>
-            <option>INDIGO</option>
-            <option>CRIMSONBELL</option>
-            <option>BLUEBELL</option>
-            <option>YELLOWBELL</option>
-            <option>CYANBELL</option>
-            <option>REDBELL</option>
-            <option>LIMEBELL</option>
-            <option>GREENBELL</option>
-            <option>RAINBOWBELL</option>
-            <option>BLACKBELL</option>
-            <option>SPIKESBELL</option>
-            <option>WHITEBELL</option>
-            <option>PINKBELL</option>
-            <option>PURPLEBELL</option>
-            <option>MULTIBELL</option>
-            <option>INDIGOBELL</option>
-            <option>CRIMSONBOW</option>
-            <option>BLUEBOW</option>
-            <option>YELLOWBOW</option>
-            <option>CYANBOW</option>
-            <option>REDBOW</option>
-            <option>LIMEBOW</option>
-            <option>GREENBOW</option>
-            <option>RAINBOWBOW</option>
-            <option>BLACKBOW</option>
-            <option>SPIKESBOW</option>
-            <option>WHITEBOW</option>
-            <option>PINKBOW</option>
-            <option>PURPLEBOW</option>
-            <option>MULTIBOW</option>
-            <option>INDIGOBOW</option>
-            <option>CRIMSONNYLON</option>
-            <option>BLUENYLON</option>
-            <option>YELLOWNYLON</option>
-            <option>CYANNYLON</option>
-            <option>REDNYLON</option>
-            <option>LIMENYLON</option>
-            <option>GREENNYLON</option>
-            <option>RAINBOWNYLON</option>
-            <option>BLACKNYLON</option>
-            <option>SPIKESNYLON</option>
-            <option>WHITENYLON</option>
-            <option>PINKNYLON</option>
-            <option>PURPLENYLON</option>
-            <option>MULTINYLON</option>
-            <option>INDIGONYLON</option>
-          </optgroup>
-        </select>
-        <button class="random-button" data-select-id="accessory-select">
-          🔀
-        </button>
-      </div>
-
-      <div class="form-row">
-        <label>Scar</label>
-        <select class="scar-select">
-          <option></option>
-          <optgroup label="Animal Scars (scars1)">
-            <option>ONE</option>
-            <option>TWO</option>
-            <option>THREE</option>
-            <option>TAILSCAR</option>
-            <option>SNOUT</option>
-            <option>CHEEK</option>
-            <option>SIDE</option>
-            <option>THROAT</option>
-            <option>TAILBASE</option>
-            <option>BELLY</option>
-            <option>LEGBITE</option>
-            <option>NECKBITE</option>
-            <option>FACE</option>
-            <option>MANLEG</option>
-            <option>BRIGHTHEART</option>
-            <option>MANTAIL</option>
-            <option>BRIDGE</option>
-            <option>RIGHTBLIND</option>
-            <option>LEFTBLIND</option>
-            <option>BOTHBLIND</option>
-            <option>BEAKCHEEK</option>
-            <option>BEAKLOWER</option>
-            <option>CATBITE</option>
-            <option>RATBITE</option>
-            <option>QUILLCHUNK</option>
-            <option>QUILLSCRATCH</option>
-            <option>HINDLEG</option>
-            <option>BACK</option>
-            <option>QUILLSIDE</option>
-            <option>SCRATCHSIDE</option>
-            <option>BEAKSIDE</option>
-            <option>CATBITETWO</option>
-            <option>FOUR</option>
-          </optgroup>
-          <optgroup label="Event Scars (scars3)">
-            <option>SNAKE</option>
-            <option>TOETRAP</option>
-            <option>BURNPAWS</option>
-            <option>BURNTAIL</option>
-            <option>BURNBELLY</option>
-            <option>BURNRUMP</option>
-            <option>FROSTFACE</option>
-            <option>FROSTTAIL</option>
-            <option>FROSTMITT</option>
-            <option>FROSTSOCK</option>
-            <option>TOE</option>
-            <option>SNAKETWO</option>
-          </optgroup>
-          <optgroup label="Missing Parts (scars2)">
-            <option>LEFTEAR</option>
-            <option>RIGHTEAR</option>
-            <option>NOTAIL</option>
-            <option>HALFTAIL</option>
-            <option>NOPAW</option>
-            <option>NOLEFTEAR</option>
-            <option>NORIGHTEAR</option>
-            <option>NOEAR</option>
-          </optgroup>
-        </select>
-        <button class="random-button" data-select-id="scar-select">🔀</button>
-      </div>
-
-      <div class="form-row">
-        <label>Lineart</label>
-        <select class="lineart-select">
-          <option value="regular">Regular</option>
-          <option value="dead">Dead</option>
-          <option value="dark forest">Dark Forest</option>
-          <option value="aprilfools-regular">Regular (April Fools')</option>
-          <option value="aprilfools-dead">Dead (April Fools')</option>
-          <option value="aprilfools-dark forest">
-            Dark Forest (April Fools')
-          </option>
-        </select>
-      </div>
-
-      <div class="form-row">
-        <label>Shading</label>
-        <input class="shading-checkbox" type="checkbox" />
-      </div>
-
-      <div class="form-row">
-        <label>Reverse</label>
-        <input class="reverse-checkbox" type="checkbox" />
-      </div>
-
-      <div class="form-row">
-        <label>BG Colour</label>
-        <select class="bg-color-select">
-          <option value="rgb(0 0 0 / 0)">Transparent</option>
-          <option value="rgb(255 255 255)">White</option>
-          <option value="rgb(0 0 0)">Black</option>
-          <option value="rgb(0 255 0)">Lime Green</option>
-          <option value="rgb(206 194 168)">ClanGen Light</option>
-          <option value="rgb(57 50 36)">ClanGen Dark</option>
-          <option value="rgb(39 45 79)">Starry Blue</option>
-          <option value="rgb(158 151 170)">Unknown Grey</option>
-          <option value="rgb(42 17 13)">Starless Red</option>
-        </select>
-      </div>
-
-      <div class="form-row">
-        <label>Scale</label>
-        <select class="zoom-level">
-          <option value="1">1x</option>
-          <option value="2">2x</option>
-          <option selected value="3">3x</option>
-          <option value="4">4x</option>
-          <option value="8">8x</option>
-          <option value="16">16x</option>
-          <option value="32">32x</option>
-        </select>
-      </div>
-
-      <div>
-        <button class="randomize-all-button">Randomize</button>
-      </div>
-      <div>
-        <button class="copy-url-button">Copy this cat's URL</button>
-      </div>
-      <div>
-        <button class="import-json-button">Import JSON data</button>
-      </div>
-
-      <div class="sharecode-div form-row">
-        <label
-          >Appearance Data <br />
-          (does not contain all data; use only as reference)</label
-        >
-        <textarea readonly rows="10" class="sharecode"></textarea>
-      </div>
-    </form>
-
-    <div>
-      <p>
-        <a href="https://sablesteel.itch.io/clan-gen-fan-edit">ClanGen</a>
-        Thanks to the clangen devteam for these amazing sprites!
-      </p>
-      <p>
-        Source code is available
-        <a href="https://github.com/gootraxian/upgraded-clangen-pixel-maker">here on GitHub</a>. For license information, visit <a href="https://https://cgen-tools.github.io/pixel-cat-maker">the original clangen sprite generator</a>
-      </p>
     </div>
 
     <script type="module" src="/src/main.ts"></script>
