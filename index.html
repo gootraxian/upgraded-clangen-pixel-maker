@@ -23,22 +23,18 @@
         scrollbar-color: #ffffff40 rgba(0,0,0,0.2);
       }
 
-      /* Animated starfield background */
-      body::before {
-        content: '';
+      /* Video background */
+      #bgVideo {
         position: fixed;
-        inset: 0;
-        background:
-          radial-gradient(ellipse at 20% 50%, rgba(60, 40, 120, 0.3) 0%, transparent 60%),
-          radial-gradient(ellipse at 80% 20%, rgba(20, 60, 100, 0.3) 0%, transparent 60%),
-          radial-gradient(ellipse at 50% 80%, rgba(80, 20, 80, 0.2) 0%, transparent 60%);
+        right: 0;
+        bottom: 0;
+        min-width: 100%;
+        min-height: 100%;
+        width: auto;
+        height: auto;
         z-index: -1;
-        animation: bgShift 12s ease-in-out infinite alternate;
-      }
-
-      @keyframes bgShift {
-        from { filter: hue-rotate(0deg); }
-        to   { filter: hue-rotate(30deg); }
+        object-fit: cover;
+        filter: brightness(0.6);
       }
 
       /* ── Page layout ── */
@@ -88,6 +84,14 @@
         align-items: center;
         gap: 1rem;
         min-width: 200px;
+        max-width: min(90vw, 600px);
+        overflow: auto;
+      }
+
+      .cat-sprite-img {
+        max-width: 100%;
+        height: auto;
+        display: block;
       }
 
       .sprite-preview-card h2 {
@@ -180,6 +184,8 @@
         background-repeat: no-repeat;
         background-position: right 10px center;
         padding-right: 28px;
+        max-height: 38px;
+        overflow-y: auto;
       }
 
       select:hover {
@@ -368,11 +374,15 @@
     </style>
   </head>
   <body>
+    <video id="bgVideo" autoplay muted loop playsinline>
+      <source src="/videos/bg.mp4" type="video/mp4">
+    </video>
+
     <div class="page-wrapper">
 
       <header>
-        <h1>Katto's ClanGen Pixel Cat Maker</h1>
-        <p>Build a cat from clangen in your browser — no download required!</p>
+        <h1>🐱 Katto's ClanGen Pixel Cat Maker</h1>
+        <p>Build a sprite in your browser — no download required!</p>
       </header>
 
       <div class="main-layout">
