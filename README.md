@@ -1,3 +1,13 @@
+Hi! I'm katto and I edited the original page, so it became more user friendly and I could get a bigger scale on the output!
+
+# To the clangen developers: If they see this:
+This fork is ready to be merged with the main branch, as long as you remove the references to my name, I believe its fine, but please, give me credit!
+
+![Preview of the website](https://raw.githubusercontent.com/gootraxian/upgraded-clangen-pixel-maker/refs/heads/main/Sprite.png "Preview")
+
+Heres the original README.md:
+
+
 # Pixel Cat Maker
 
 Dollmaker that uses sprites from ClanGen.
